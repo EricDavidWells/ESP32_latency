@@ -21,6 +21,7 @@ lat_time_start = start_time
 latency = np.array([])
 filename = "latency_test_.txt"
 f = open(filename, "w")
+
 while time.perf_counter() < start_time + test_len:
 
     returnmessage = "h"
@@ -30,8 +31,9 @@ while time.perf_counter() < start_time + test_len:
     ready = select.select([s], [], [], timeout)
     if ready[0]:
         (message, address) = s.recvfrom(rec_len)
-        f.write(str(time.perf_counter()-lat_time_start) + ",")
+        rectime = time.perf_counter()
+        f.write(str(rectime-lat_time_start) + ",")
         print(address, message, message.hex())
-        lat_time_start = time.perf_counter()
+        lat_time_start = rectime
 
 f.close()
