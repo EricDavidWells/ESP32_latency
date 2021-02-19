@@ -1,11 +1,13 @@
 #include <WiFi.h>
 #include <WiFiClient.h>
 
-const char* ssid     = "fukyaboi";
-const char* password = "fukyaboi";
+const char* ssid     = "ESP32";
+const char* password = "ericiscool";
 
 const uint16_t port = 8090;
 const char * host = "192.168.4.2";
+
+int msg_size = 16;
 
 WiFiClient client;
 WiFiServer wifiServer(port);
@@ -27,15 +29,14 @@ void loop() {
   client = wifiServer.available();
   if (client) {
 
-    client.setNoDelay(true);
+    client.setNoDelay(true);  // disable Nagles algorithm
  
     while (client.connected()) {
-      int send_len = 16;
-      byte send_buf[send_len];
-      for (byte j=0; j<send_len; j++){
+      byte send_buf[msg_size];
+      for (byte j=0; j<msg_size; j++){
         send_buf[j] = j;
       }
-      int totalbytesent = client.write(send_buf, send_len);
+      int totalbytesent = client.write(send_buf, msg_size);
       client.flush();
 //      Serial.print("Sent Number of Bytes: ");Serial.println(totalbytesent);
     }

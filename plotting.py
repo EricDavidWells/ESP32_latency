@@ -1,34 +1,35 @@
 import numpy as np
 from matplotlib import pyplot as plt
-from matplotlib.ticker import NullFormatter  # useful for `logit` scale
+from matplotlib.ticker import NullFormatter
 
 
 def latency_plot(filename, maxvalue=None):
-    data = np.genfromtxt(filename, delimiter=',')
+    data = np.genfromtxt(filename, delimiter='\n')
     data = data[np.logical_not(np.isnan(data))]
 
     if maxvalue is None:
         maxvalue = max(data)
 
     plt.figure()
-    H = plt.hist(data, bins=np.linspace(0, maxvalue, 1000))
+    H = plt.hist(data, bins=np.linspace(0, maxvalue, 1000), color='darkslategray')
     plt.xlabel("Latency (s)")
     plt.ylabel("# of Occurrences")
-    plt.title("Latency of ESP32 Access Point Using Handshake Bi-Directional Communication")
+    plt.title("Latency Histogram")
     x = data.max()/2
     y = H[0].max()/2
-    plt.text(x, y, "Mean Value: " + str(np.mean(data)), horizontalalignment='center', verticalalignment='center')
+
+    meanval = np.round(np.mean(data), 5)
+    meanfreq = np.round(1/meanval, 5)
+    # plt.text(x, y, "Mean Value: " + str(meanval) + "\nMean Freq (Hz): " + str(meanfreq), horizontalalignment='center', verticalalignment='center')
 
 
 def latency_plot_log(filename, maxvalue=None):
 
-    data = np.genfromtxt(filename, delimiter=',')
+    data = np.genfromtxt(filename, delimiter='\n')
     data = data[np.logical_not(np.isnan(data))] # remove nan entries
     if maxvalue is None:
         maxvalue = max(data)
 
-    # print(len(data))
-    # print(sum(data))
     data_range = (min(data), max(data))
 
     y = np.linspace(data_range[0], data_range[1], 10000)
@@ -39,18 +40,19 @@ def latency_plot_log(filename, maxvalue=None):
         x[i] = count/data.size
 
     plt.figure()
-    plt.title("Latency (ESP32 Handshake)")
+    plt.title("Logit")
+    plt.ylim([0, 0.01])
     plt.xscale('logit')
-    plt.plot(x, y)
+    plt.plot(x, y, color='darkslategray')
+    plt.gca().xaxis.set_major_formatter(PercentFormatter())
     plt.gca().xaxis.set_minor_formatter(NullFormatter())
 
     plt.xlabel("Percentage of Transfers")
-    plt.ylabel("Time (s)")
-    # plt.text(x, y, "Mean Value: " + str(np.mean(data)), horizontalalignment='center', verticalalignment='center')
+    plt.ylabel("Latency (s)")
 
 
 def throughput_plot(filename, maxvalue=None):
-    data = np.genfromtxt(filename, delimiter=',')
+    data = np.genfromtxt(filename, delimiter='\n')
     data = data[np.logical_not(np.isnan(data))] # remove nan entries
 
     if maxvalue is None:
@@ -58,7 +60,7 @@ def throughput_plot(filename, maxvalue=None):
 
     plt.figure()
 
-    H = plt.hist(data, bins=np.linspace(0, maxvalue, 1000))
+    H = plt.hist(data, bins=np.linspace(0, maxvalue, 1000), color='darkslategray')
     plt.xlabel("Latency (s)")
     plt.ylabel("# of Occurrences")
     plt.title("Throughput")
@@ -72,13 +74,11 @@ def throughput_plot(filename, maxvalue=None):
 
 def throughput_plot_log(filename, maxvalue=None):
 
-    data = np.genfromtxt(filename, delimiter=',')
+    data = np.genfromtxt(filename, delimiter='\n')
     data = data[np.logical_not(np.isnan(data))]  # remove nan entries
     if maxvalue is None:
         maxvalue = max(data)
 
-    # print(len(data))
-    # print(sum(data))
     data_range = (min(data), max(data))
 
     y = np.linspace(data_range[0], data_range[1], 10000)
@@ -91,14 +91,14 @@ def throughput_plot_log(filename, maxvalue=None):
     plt.figure()
     plt.title("Throughput")
     plt.xscale('logit')
-    plt.plot(x, y)
+    plt.plot(x, y, color='darkslategray')
     plt.gca().xaxis.set_minor_formatter(NullFormatter())
     plt.xlabel("Percentage of Transfers")
     plt.ylabel("Time (s)")
 
 
 def time_series_plot(filename, maxvalue=None):
-    data = np.genfromtxt(filename, delimiter=',')
+    data = np.genfromtxt(filename, delimiter='\n')
     data = data[np.logical_not(np.isnan(data))]  # remove nan entries
     if maxvalue is None:
         maxvalue = max(data)
@@ -106,23 +106,20 @@ def time_series_plot(filename, maxvalue=None):
     x = np.cumsum(data)
     plt.figure()
     plt.title("Time Series")
-    plt.plot(x, data)
+    plt.plot(x, data, '.', markersize=2, color='darkslategray')
     plt.xlabel("Time (s)")
     plt.ylabel("Latency (s)")
+
+    meanval = np.round(np.mean(data), 5)
+    print("Average latency: " + str(meanval))
 
 
 if __name__ == "__main__":
 
-    # filename = r"data\2020-07-26_TCP_throughput_test_100s_5m.txt"
-    # filename = r"data\throughput_test_16B_100s_1m.txt"
-    filename = r"data\2020-07-27_UDP_throughput_test_100s_16buf_2m.txt"
-
-    throughput_plot(filename)
-    throughput_plot_log(filename)
+    filename = r"data\TCP_latency_test_60s_1m.txt"
+    latency_plot(filename)
+    latency_plot_log(filename)
     time_series_plot(filename)
-    # latency_plot_log("latency_test_16B_100s_1m.txt")
 
-    # throughput_plot("throughput_test_16B_100s_1m.txt")
-    # latency_plot("latency_test_16B_100s_1m.txt")
     plt.show()
 
