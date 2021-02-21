@@ -2,7 +2,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.ticker import NullFormatter
 
-
 def latency_plot(filename, maxvalue=None):
     data = np.genfromtxt(filename, delimiter='\n')
     data = data[np.logical_not(np.isnan(data))]
@@ -11,8 +10,9 @@ def latency_plot(filename, maxvalue=None):
         maxvalue = max(data)
 
     plt.figure()
-    H = plt.hist(data, bins=np.linspace(0, maxvalue, 1000), color='darkslategray')
-    plt.xlabel("Latency (s)")
+    H = plt.hist(data, bins=np.linspace(0, maxvalue, 250), color='darkslategray')
+
+    plt.xlabel("Latency (ms)")
     plt.ylabel("# of Occurrences")
     plt.title("Latency Histogram")
     x = data.max()/2
@@ -41,14 +41,13 @@ def latency_plot_log(filename, maxvalue=None):
 
     plt.figure()
     plt.title("Logit")
-    plt.ylim([0, 0.01])
+    # plt.ylim([0, 0.01])
     plt.xscale('logit')
     plt.plot(x, y, color='darkslategray')
-    plt.gca().xaxis.set_major_formatter(PercentFormatter())
     plt.gca().xaxis.set_minor_formatter(NullFormatter())
 
     plt.xlabel("Percentage of Transfers")
-    plt.ylabel("Latency (s)")
+    plt.ylabel("Latency (ms)")
 
 
 def throughput_plot(filename, maxvalue=None):
@@ -107,8 +106,8 @@ def time_series_plot(filename, maxvalue=None):
     plt.figure()
     plt.title("Time Series")
     plt.plot(x, data, '.', markersize=2, color='darkslategray')
-    plt.xlabel("Time (s)")
-    plt.ylabel("Latency (s)")
+    plt.xlabel("Time (ms)")
+    plt.ylabel("Latency (ms)")
 
     meanval = np.round(np.mean(data), 5)
     print("Average latency: " + str(meanval))
